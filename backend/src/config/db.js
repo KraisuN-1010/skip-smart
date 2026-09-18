@@ -1,5 +1,6 @@
 import pg from 'pg';
 import { ENV } from './env.js';
+
 const { Pool } = pg;
 
 export const pool = new Pool({
@@ -8,4 +9,16 @@ export const pool = new Pool({
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 5000
+});
+
+pool.on('error', (err) => {
+    console.error('❌ Postgres pool error:', err.message);
+});
+
+let hasLoggedFirstConnection = false;
+pool.on('connect', () => {
+    if (!hasLoggedFirstConnection) {
+        console.log('✅ Postgres connection pool active');
+        hasLoggedFirstConnection = true;
+    }
 });
